@@ -4,11 +4,11 @@ import pickle
 import os
 import numpy as np
 from dotenv import load_dotenv
+
 try:
     from openai import OpenAI
 except Exception:
     OpenAI = None
-
 
 load_dotenv()
 
@@ -145,13 +145,13 @@ st.subheader("✉️ AI Retention Email")
 if st.button("Generate AI Email"):
     api_key = os.getenv("OPENAI_API_KEY")
 
-    if not api_key:
+    if not api_key or OpenAI is None:
         st.warning("GenAI not connected. Showing fallback email.")
         st.markdown(
             "<div class='email-box'>"
             "Hi! We truly value your association with us. "
             "We noticed some concerns in your recent experience and would love to "
-            "offer you a special discount along with priority support to serve you better."
+            "offer you a special discount along with priority support."
             "</div>",
             unsafe_allow_html=True
         )
@@ -178,7 +178,7 @@ if st.button("Generate AI Email"):
             )
 
         except Exception:
-            st.warning("⚠️ GenAI quota exceeded. Showing fallback email.")
+            st.warning("⚠️ GenAI unavailable. Showing fallback email.")
             st.markdown(
                 "<div class='email-box'>"
                 "Hi! We value your loyalty. To ensure a better experience, "
@@ -197,5 +197,3 @@ st.markdown("""
 © 2026 Telco AI Solutions | ML • Explainable AI • GenAI
 </p>
 """, unsafe_allow_html=True)
-
-
