@@ -4,7 +4,11 @@ import pickle
 import os
 import numpy as np
 from dotenv import load_dotenv
-from openai import OpenAI
+try:
+    from openai import OpenAI
+except Exception:
+    OpenAI = None
+
 
 load_dotenv()
 
@@ -193,4 +197,5 @@ st.markdown("""
 © 2026 Telco AI Solutions | ML • Explainable AI • GenAI
 </p>
 """, unsafe_allow_html=True)
+
 
