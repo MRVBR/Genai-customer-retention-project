@@ -6,27 +6,15 @@ import numpy as np
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# =========================
-# Load environment variables
-# =========================
 load_dotenv()
 
-# =========================
-# Load trained artifacts
-# =========================
 model = pickle.load(open("churn_model.pkl", "rb"))
 explainer = pickle.load(open("shap_explainer.pkl", "rb"))
 columns = pickle.load(open("encoder_columns.pkl", "rb"))
 metrics = pickle.load(open("model_metrics.pkl", "rb"))
 
-# =========================
-# Page configuration
-# =========================
 st.set_page_config(page_title="AI Customer Retention", layout="wide")
 
-# =========================
-# Styling
-# =========================
 st.markdown("""
 <style>
 body { background-color: #f6f7fb; }
@@ -58,9 +46,6 @@ body { background-color: #f6f7fb; }
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# Branding
-# =========================
 st.markdown("""
 <div style="text-align:center;">
     <h1>🏢 TELCO AI SOLUTIONS</h1>
@@ -68,9 +53,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# =========================
-# Sidebar Inputs
-# =========================
 st.sidebar.header("📥 Customer Input")
 
 tenure = st.sidebar.slider("Tenure (months)", 0, 72, 3)
@@ -79,9 +61,6 @@ total = st.sidebar.slider("Total Charges", 20, 10000, 300)
 tech = st.sidebar.selectbox("Tech Support", ["No", "Yes"])
 contract = st.sidebar.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
 
-# =========================
-# Prepare Input Data
-# =========================
 input_data = {
     "tenure": tenure,
     "MonthlyCharges": monthly,
@@ -92,29 +71,21 @@ input_data = {
 
 input_df = pd.DataFrame([input_data])
 
-# Align columns safely
 for col in columns:
     if col not in input_df.columns:
         input_df[col] = 0
 
 input_df = input_df[columns]
 
-# =========================
-# Prediction
-# =========================
 churn_prob = float(model.predict_proba(input_df)[0][1])
 prediction = "CHURN" if churn_prob > 0.5 else "SAFE"
 email_confidence = round((1 - churn_prob) * 100, 1)
 
 col1, col2 = st.columns(2)
 
-# -------------------------
-# Prediction Card
-# -------------------------
 with col1:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📊 Churn Risk Analysis")
-
     st.progress(int(churn_prob * 100))
     st.metric("Churn Probability", f"{churn_prob:.2f}")
 
@@ -125,9 +96,6 @@ with col1:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# -------------------------
-# Explainability (SIMPLIFIED & SAFE)
-# -------------------------
 reasons = []
 
 with col2:
@@ -135,7 +103,6 @@ with col2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.subheader("🧠 Why Customer May Leave")
 
-        # Human-readable, stable explanations
         if tenure < 6:
             reasons.append("Low customer tenure")
             st.write("• Low customer tenure")
@@ -157,9 +124,6 @@ with col2:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================
-# Model Metrics
-# =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("📈 Model Performance")
 
@@ -171,9 +135,6 @@ c4.metric("F1 Score", f"{metrics['f1']:.2f}")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================
-# GenAI Email (SAFE FALLBACK)
-# =========================
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 st.subheader("✉️ AI Retention Email")
 
@@ -226,12 +187,10 @@ if st.button("Generate AI Email"):
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================
-# Footer
-# =========================
 st.markdown("""
 <hr>
 <p style="text-align:center; font-size:13px; color:gray;">
 © 2026 Telco AI Solutions | ML • Explainable AI • GenAI
 </p>
 """, unsafe_allow_html=True)
+
